@@ -10,3 +10,6 @@ TRAIN_COLOR_INPUT = "Ingrese el número correspondiente al color del tren que de
 WHITE = "BLANCO"
 GREEN = "VERDE"
 RED = "ROJO"
+NOT_VISITED_STATE = 'not_visited'
+VISITING_STATE = "visiting"
+VISITED_STATE = "visited"

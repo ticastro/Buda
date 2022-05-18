@@ -1,20 +1,30 @@
+import os
 from collections import deque
 from .station import Station
-import os
-
+from utils import FILE, DIR, WHITE, GREEN, RED, NOT_VISITED_STATE, VISITED_STATE, VISITING_STATE
 
 def skipStation(station, color):
-  if station.color == 'BLANCO': return False
-  if color != 'BLANCO' and color != station.color:
+  if station.color == WHITE: return False
+  if color != WHITE and color != station.color:
     station.skipped = True
     return True
   return False
 
+def validateStations(network, initialStation, endStation, trainColor):
+  initialColor = network.allStations[initialStation].color
+  finalColor = network.allStations[endStation].color
+  if trainColor != WHITE:
+    if initialColor != trainColor and initialColor != WHITE:
+      return False
+    elif finalColor != trainColor and finalColor != WHITE:
+      return False
+  return True
+
 class SubwayNetwork:
   def __init__(self, input):
     self.allStations = {}
-    dir = os.path.dirname(os.path.realpath('__file__'))
-    filename = os.path.join(dir, 'test', input)
+    dir = os.path.dirname(os.path.realpath(FILE))
+    filename = os.path.join(dir, DIR, input)
     with open(filename, 'r') as file: 
       for i in file:
         lineSplit = i.split(',')
@@ -22,14 +32,12 @@ class SubwayNetwork:
         newStation = Station(lineSplit[0], lineSplit[1], lineSplit[2:])
         self.allStations[f'{newStation.identifier}'] = newStation
 
-  def BFS(self, initialStationId, endStationId, colorTrain):
-    # REVISAR CASOS BORDE:
-    # 1. Inicio en estación de un color que no puede el tren
-    # 2. Final en una estacióon de un color que no puede el tren
-    # 3. Estación de llegada es una isla
-    # 4. No se llega (3 y 4 pueden ser iguales)
+  def bfs(self, initialStationId, endStationId, colorTrain):
+    stationValidator = validateStations(self, initialStationId, endStationId, colorTrain)
+    if not stationValidator:
+      return self.allStations[endStationId].previousStations
     initialStation = self.allStations[initialStationId] 
-    initialStation.colorBFS = 'gray'
+    initialStation.bfsState = VISITING_STATE
     queue = deque([])
     queue.append(initialStationId)
     while len(queue) != 0:
@@ -37,16 +45,13 @@ class SubwayNetwork:
       reviewStation = self.allStations[reviewStationId]
       for nextStationId in reviewStation.neighbours:
         nextStation = self.allStations[nextStationId]
-        if nextStation.colorBFS == 'white':
-          nextStation.colorBFS = 'gray'
+        if nextStation.bfsState == NOT_VISITED_STATE:
+          nextStation.bfsState = VISITING_STATE
           if skipStation(nextStation, colorTrain):
             nextStation.setPreviousStations(reviewStation)
             queue.appendleft(nextStation.identifier)
             break
           nextStation.setPreviousStations(reviewStation)
-          if nextStation.identifier == endStationId:
-            queue = []
-            break
           queue.append(nextStation.identifier)
-      reviewStation.colorBFS = 'black'
-    print(f'El camino para llegar a {endStationId} es {self.allStations[endStationId].previousStations}')
+      reviewStation.bfsState = VISITED_STATE
+    return self.allStations[endStationId].previousStations

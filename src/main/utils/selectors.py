@@ -5,7 +5,7 @@ from .const import (FILE, DIR, FILE_SELECTION_OPEN, WRONG_INPUT, ENTER_FILE_SELE
  RED, GREEN)
 
 def inputValidator(input, max): 
-  if not 0 < int(input) <= max:
+  if not 0 < int(input) < max:
     return False
   return True
 
@@ -56,7 +56,7 @@ def stationSelector(case, network):
   return stations[station - 1] 
 
 def colorSelector():
-  colors = [WHITE, GREEN, RED] # Tirar esto a una lista tambien
+  colors = [WHITE, GREEN, RED]
   for i in range(len(colors)):
     print(f'{i+1}.  {colors[i]}')
   try:

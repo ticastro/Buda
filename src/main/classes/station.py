@@ -1,9 +1,11 @@
+from utils import NOT_VISITED_STATE
+
 class Station:
   def __init__(self, identifier, color, neighbours):
     self.identifier = identifier
     self.color = color
     self.neighbours = neighbours
-    self.colorBFS = 'white'
+    self.bfsState = NOT_VISITED_STATE
     self.previousStations = []
     self.skipped = False
 
@@ -14,3 +16,4 @@ class Station:
     if not previousStation.skipped:
       previousStationsArray.append(previousStation.identifier)
     self.previousStations = previousStationsArray
+    return self.previousStations
